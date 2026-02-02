@@ -1,0 +1,36 @@
+import mongoose, { Document, Schema } from "mongoose";
+
+export interface IMessage extends Document {
+  chat: mongoose.Types.ObjectId;
+  sender: mongoose.Types.ObjectId;
+  text: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+const MessageSchema = new Schema<IMessage>(
+  {
+    chat: {
+      type: Schema.Types.ObjectId,
+      ref: "Chat",
+      required: true,
+    },
+
+    sender: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+      default: null,
+    },
+    text: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+  },
+  { timestamps: true },
+);
+
+// its indexing --> oldest message will be first (if newest first use -1 at createdAt)
+MessageSchema.index({ chat: 1, createdAt: 1 }); // ascending
+
+export const Message = mongoose.model("Message", MessageSchema);
